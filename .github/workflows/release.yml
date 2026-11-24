@@ -12,14 +12,12 @@ jobs:
   build:
     strategy:
       fail-fast: false
+      # windows-latest = x64; ubuntu-22.04 = x64 with an older glibc (runs on more distributions);
+      # macos-14 = arm64 (Apple silicon), built only when the repository variable RELEASE_MACOS is
+      # "true" (Settings -> Secrets and variables -> Actions -> Variables): GitHub's macOS runners
+      # were often out of capacity, so releases go out without a macOS file by default.
       matrix:
-        include:
-          - os: windows-latest   # x64
-            asset: LogosUpdater-windows-x64.exe
-          - os: ubuntu-22.04     # x64; older glibc = runs on more distributions
-            asset: LogosUpdater-linux-x64
-          - os: macos-14         # arm64 (Apple silicon)
-            asset: LogosUpdater-macos-arm64
+        include: ${{ fromJSON(vars.RELEASE_MACOS == 'true' && '[{"os":"windows-latest","asset":"LogosUpdater-windows-x64.exe"},{"os":"ubuntu-22.04","asset":"LogosUpdater-linux-x64"},{"os":"macos-14","asset":"LogosUpdater-macos-arm64"}]' || '[{"os":"windows-latest","asset":"LogosUpdater-windows-x64.exe"},{"os":"ubuntu-22.04","asset":"LogosUpdater-linux-x64"}]') }}
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -82,7 +80,7 @@ jobs:
         run: |
           ls -l dist
           test -f dist/LogosUpdater-windows-x64.exe && test -f dist/LogosUpdater-linux-x64
-          test -f dist/LogosUpdater-macos-arm64 || echo "::warning::No macOS file in this release (build failed or no runner)"
+          test -f dist/LogosUpdater-macos-arm64 || echo "::notice::No macOS file in this release (RELEASE_MACOS not set, build failed or no runner)"
       - name: Create release
         env:
           GH_TOKEN: ${{ github.token }}

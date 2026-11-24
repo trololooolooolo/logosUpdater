@@ -22,7 +22,7 @@ License: [MIT](LICENSE).
 ## Download
 
 Ready-made files for each system are attached to the [**Releases**](https://github.com/trololooolooolo/logosUpdater/releases) of this GitHub repository:
-`LogosUpdater-windows-x64.exe`, `LogosUpdater-macos-arm64`, `LogosUpdater-linux-x64`.
+`LogosUpdater-windows-x64.exe`, `LogosUpdater-linux-x64` and, not in every release, `LogosUpdater-macos-arm64`.
 Put the file in its own folder and start it — the user guide explains the first start on
 each system. Docker: `docker compose up -d`, then open <http://localhost:8000>.
 No file for your system there yet? Use the green **Code → Download ZIP** button and run it

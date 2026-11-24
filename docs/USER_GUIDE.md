@@ -54,7 +54,7 @@ Pick **one** of the ways below. The ready-made file is the easiest.
    | System | File |
    |---|---|
    | Windows (64-bit) | `LogosUpdater-windows-x64.exe` |
-   | macOS (Apple silicon: M1, M2, …) | `LogosUpdater-macos-arm64` |
+   | macOS (Apple silicon: M1, M2, …) | `LogosUpdater-macos-arm64` (not in every release) |
    | Linux (64-bit) | `LogosUpdater-linux-x64` |
 
    No file for your system on that page yet? Use **From source** below.

@@ -56,7 +56,7 @@ Wybierz **jeden** z poniższych sposobów. Najprostszy jest gotowy plik.
    | System | Plik |
    |---|---|
    | Windows (64-bit) | `LogosUpdater-windows-x64.exe` |
-   | macOS (Apple silicon: M1, M2, …) | `LogosUpdater-macos-arm64` |
+   | macOS (Apple silicon: M1, M2, …) | `LogosUpdater-macos-arm64` (nie w każdym wydaniu) |
    | Linux (64-bit) | `LogosUpdater-linux-x64` |
 
    Na tej stronie nie ma jeszcze pliku dla Twojego systemu? Skorzystaj z punktu **Ze źródeł** poniżej.
