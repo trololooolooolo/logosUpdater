@@ -10,7 +10,10 @@ a = Analysis(
     [os.path.join(ROOT, 'view_stations.py')],
     pathex=[ROOT],
     datas=[(os.path.join(ROOT, 'web'), 'web'), (os.path.join(ROOT, 'lang'), 'lang'),
-           (os.path.join(ROOT, 'LICENSE'), '.')],
+           (os.path.join(ROOT, 'LICENSE'), '.')]
+          # written by packaging/third_party_notices.py (release.yml) before the build
+          + ([(os.path.join(ROOT, 'THIRD_PARTY_NOTICES.txt'), '.')]
+             if os.path.isfile(os.path.join(ROOT, 'THIRD_PARTY_NOTICES.txt')) else []),
     # data-source plugins are discovered at runtime (pkgutil), so list them explicitly
     # (collect_submodules would import from an isolated process without ROOT on sys.path)
     hiddenimports=['sources.' + f[:-3] for f in sorted(os.listdir(os.path.join(ROOT, 'sources')))

@@ -8,7 +8,7 @@ Kluczowe fakty o formacie (potwierdzone empirycznie na station_logos.img):
   * bootblock      : 0x2000 bajtów na początku
   * superblock #1  : @0x2000, obszar 0x1000 (struktura 392 B)
   * blok -> offset : 0x3000 + block*blocksize   (czyli BOOTBLOCK+SB_AREA + n*bs)
-  * superblock CRC : crc32_be(0, sb[8:512], 504)   <-- ZŁAMANE empirycznie
+  * superblock CRC : crc32_be(0, sb[8:512], 504)   <-- ustalone empirycznie
   * inode #1       : katalog root
   * dir entry      : 32 B = de_inode(4) + de_size(1, =len nazwy; 0xff=longname) + name(27)
   * inode          : 128 B (patrz INODE struct)
@@ -53,7 +53,7 @@ def qnx6_lfile_checksum(name):
     """Suma kontrolna nazwy dla long-dirent (pole de_checksum).
     Odwzorowanie qnx6_lfile_checksum z jadra Linux (fs/qnx6): per bajt
     crc = ((crc>>1) + c) ^ (crc & 1 ? 0x80000000 : 0), warunek na STARYM crc.
-    Zweryfikowane bajtowo na apps.img: 'Receiver_TPEG_Traffic_Client' -> 0x48058cdd."""
+    Przyklad: 'an_example_name_longer_than_27_bytes.PNG' -> 0x0e0dda93."""
     if isinstance(name, str):
         name = name.encode('utf-8')
     crc = 0
@@ -669,7 +669,7 @@ class QNX6Writer:
         meta_blocks = self.next_block            # bitmapa + tablica inode (gen-1)
         self.gen2_reserve = self._alloc(meta_blocks)   # gen-2: bloki puste, zarezerwowane
 
-        # 2b) DRZEWO LONGFILE (nazwy > 27 bajtow). Format qnx6 (zweryfikowany na apps.img):
+        # 2b) DRZEWO LONGFILE (nazwy > 27 bajtow). Format qnx6 (zgodny z fs/qnx6 jadra Linux):
         #   - long-dirent (32B): de_inode(4) de_size=0xff(1) unk[3] de_long_inode(4) de_checksum(4)+0
         #   - de_long_inode = LOGICZNY indeks bloku w pliku longfile (0,1,2,...)
         #   - kazdy blok pliku longfile = jeden wpis: lf_size(u16) + nazwa (do 510 B)

@@ -34,6 +34,8 @@ jobs:
         run: |
           python -c "import re,sys; p='fetcher.py'; s=open(p,encoding='utf-8').read(); open(p,'w',encoding='utf-8',newline='').write(re.sub(r'(?m)^VERSION = .*', 'VERSION = ' + repr(sys.argv[1]), s, count=1))" "${GITHUB_REF_NAME#v}"
           grep '^VERSION' fetcher.py
+      - name: Third-party licences (bundled in the executable, attached to the release)
+        run: python packaging/third_party_notices.py THIRD_PARTY_NOTICES.txt
       - run: pyinstaller --noconfirm --clean packaging/logosupdater.spec
       - name: Smoke test (starts, writes config.yaml next to the executable)
         shell: bash
@@ -64,6 +66,11 @@ jobs:
         with:
           name: ${{ matrix.asset }}
           path: dist/${{ matrix.asset }}
+      - uses: actions/upload-artifact@v4
+        if: runner.os == 'Linux'
+        with:
+          name: THIRD_PARTY_NOTICES.txt
+          path: THIRD_PARTY_NOTICES.txt
 
   publish:
     needs: build

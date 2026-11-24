@@ -277,9 +277,10 @@ After loading you see the stations of one country in a table.
   ![The "Logo style" window: before and after for each logo](img/style-en.png)
 
   The 🤖 AI buttons are optional: they send the logos to an online AI service and need your own API
-  key. You can ignore them.
+  key. You can ignore them. If you use them, the chosen service (Google Gemini or kie.ai) receives the
+  logo images under its own terms of use and privacy policy.
 - **Background:** — only changes what you see *behind* the logo previews, to judge how a logo will
-  look on the car screen. The default is *Sync 3 – black*, like the car; on *none* white logos look
+  look on the car screen. The default is *Black, car-screen-like*; on *none* white logos look
   like empty squares. It does not change any logo. The browser remembers your choice.
 
 **Update from the internet** group
@@ -462,7 +463,7 @@ Messages you may see:
 Tick **Advanced mode** at the top right. The browser remembers it. You get extra tools for people
 who know what they are doing:
 
-![Advanced mode: Logo versions, Build .img, Package filter, background "Sync 3 – black"](img/advanced-en.png)
+![Advanced mode: Logo versions, Build .img, Package filter, black background](img/advanced-en.png)
 
 - **🎨 Logo versions** — when a logo file exists in two versions (in the loaded image and among
   downloaded/styled logos), choose per file which one goes to the car.
@@ -564,5 +565,5 @@ kept). To back up your work or move to another computer, copy the whole folder. 
 LogosUpdater is an independent community project. It is **not affiliated with, endorsed by or
 supported by Ford Motor Company**. *Ford* and *SYNC* are trademarks of their owners and are named
 here only to describe compatibility. Station logos belong to their broadcasters; none are shipped
-with this app — you work with the files from your own car. Changing your [head unit](GLOSSARY.md#head-unit) is **at your own
+with this app. The app contains no Ford software, firmware or data; it works only on the files from your own car. Changing your [head unit](GLOSSARY.md#head-unit) is **at your own
 risk** and may affect your warranty. Always keep the backup the USB package makes.

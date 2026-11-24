@@ -13,11 +13,13 @@ car's QNX6 logo image itself (no QNX tools, no virtual machine).
 > affiliated with, endorsed by or supported by Ford Motor Company. *Ford* and
 > *SYNC* are trademarks of their respective owners and are used here only to
 > describe compatibility. Station logos are trademarks of their broadcasters and
-> are **not** distributed with this project — you work on files from your own car.
+> are **not** distributed with this project. The repository contains no Ford software,
+> firmware or data; the app works only on files from your own car.
 > Modifying your head unit is entirely at your own risk and may affect your
 > warranty. Always keep the backup the USB package makes.
 
-License: [MIT](LICENSE).
+License: [MIT](LICENSE). The release executables also bundle Python and open-source libraries;
+their licences are in `THIRD_PARTY_NOTICES.txt`, attached to every release.
 
 ## Download
 

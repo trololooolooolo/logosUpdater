@@ -278,10 +278,11 @@ Grupa **Logo**
 
   ![Okno „Styl logo”: przed i po dla każdego logo](img/style-pl.png)
 
-  Przyciski 🤖 AI są opcjonalne: wysyłają logo do internetowej usługi AI i wymagają własnego klucza
+  Przyciski 🤖 AI są opcjonalne: wysyłają logo do internetowej usługi AI (Google Gemini albo kie.ai —
+  obowiązują jej warunki i polityka prywatności) i wymagają własnego klucza
   API. Możesz je pominąć.
 - **Tło:** — zmienia tylko to, co widzisz *pod* podglądami logo, żeby ocenić, jak logo wypadnie na
-  ekranie auta. Domyślne jest *Sync 3 – czarne*, jak w aucie; przy *bez tła* białe logo wyglądają jak
+  ekranie auta. Domyślne jest *Czarne, jak ekran radia*; przy *bez tła* białe logo wyglądają jak
   puste kwadraty. Nie zmienia żadnego logo. Przeglądarka zapamiętuje wybór.
 
 Grupa **Aktualizacja z internetu**
@@ -468,7 +469,7 @@ Komunikaty, które możesz zobaczyć (auto pokazuje je po angielsku):
 Zaznacz **Tryb zaawansowany** w prawym górnym rogu. Przeglądarka to zapamięta. Pojawią się dodatkowe
 narzędzia dla osób, które wiedzą, co robią:
 
-![Tryb zaawansowany: Wersje logo, Zbuduj obraz .img, filtr Paczka, tło „Sync 3 – czarne”](img/advanced-pl.png)
+![Tryb zaawansowany: Wersje logo, Zbuduj obraz .img, filtr Paczka, czarne tło](img/advanced-pl.png)
 
 - **🎨 Wersje logo** — gdy plik logo istnieje w dwóch wersjach (we wczytanym obrazie i wśród
   pobranych/stylizowanych logo), wybierasz dla każdego pliku, która trafi do auta.
@@ -569,6 +570,6 @@ angielsku): [CONFIG.md — Where your data lives](CONFIG.md#where-your-data-live
 
 LogosUpdater to niezależny projekt społeczności. **Nie jest powiązany z Ford Motor Company, nie jest
 przez nią wspierany ani zatwierdzony**. *Ford* i *SYNC* to znaki towarowe ich właścicieli, użyte
-tu tylko do opisania zgodności. Logo stacji należą do nadawców; aplikacja nie zawiera żadnych —
-pracujesz na plikach z własnego auta. Modyfikacja [radia](GLOSSARY.md#pl-head-unit) odbywa się **na własne ryzyko** i może mieć
+tu tylko do opisania zgodności. Logo stacji należą do nadawców; aplikacja nie zawiera żadnych.
+Aplikacja nie zawiera oprogramowania, firmware ani danych Forda; działa wyłącznie na plikach z własnego auta. Modyfikacja [radia](GLOSSARY.md#pl-head-unit) odbywa się **na własne ryzyko** i może mieć
 wpływ na gwarancję. Zawsze zachowuj kopię zapasową, którą robi paczka USB.

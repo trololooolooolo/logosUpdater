@@ -79,7 +79,8 @@ python view_stations.py
 
 To move to another computer or back up your work, copy the whole data directory.
 
-`logos_sync5/` (new logo files), `logos_styled/` (styles) and `logo_choices.json` (🎨 picks) are the
+`logos_sync5/` (new logo files you add, upload or download from a data source; the name is historical
+and has nothing to do with any other SYNC version), `logos_styled/` (styles) and `logo_choices.json` (🎨 picks) are the
 user's logo library: loading another image + DBs (UI ① or `--load`) does not clear them, and the next
 normal package builds them into the image. The undo package (loaded files unchanged) ignores them;
 a style is removed with 🖌 → Remove style.
@@ -203,7 +204,8 @@ custom locations to run against a different image or database set:
 
 ### `ai` — AI redraw (🖌 Logo style → 🤖)
 
-For logos the local style cannot turn white (marked ⚠). The logo is sent to the provider, the
+For logos the local style cannot turn white (marked ⚠). The logo image is sent to the provider
+(a third party: its terms of use and privacy policy apply; nothing is sent unless you press 🤖), the
 white-on-black answer is keyed locally and styled like the rest. Answers are cached in
 `styled_dir/_ai/`, so a repeated preview or apply costs nothing.
 
@@ -305,7 +307,8 @@ back, so `--load "C:\cars\backup\" --port 8080` works as expected.
 copies it and the two DBs into the configured `paths:` targets, and **backs up any
 existing targets** as `*.bak-<timestamp>`. It also clears the mount marker so the
 gallery re-extracts the new image. `logo_ocr.db` is generated locally and is never
-overwritten by `--load`.
+overwritten by `--load`. (Of the optional OCR helpers, `ocr_api_scanner.py` sends logo images to
+OCR.space, whose terms apply; `ocr_scanner.py` runs offline.)
 
 Manual alternative: copy the three files into the app folder under their default
 names, or set `paths.image` / `paths.db_fm` / `paths.db_dab` to point at them
