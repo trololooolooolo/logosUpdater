@@ -16,7 +16,7 @@ col.actions: Akcje
 
 ctrl.country_title: "Kraj stacji wg RDS: ECC + pierwsza cyfra kodu PI (jak w 🖌 Styl logo). Lista = wszystkie kraje z baz FM/DAB; wybór przeładowuje tabelę."
 col.sort_title: "Kliknij: rosnąco → malejąco → domyślna kolejność"
-ctrl.country_rows: "{n} wierszy"
+ctrl.country_rows: "wierszy: {n}"
 ctrl.bg: "Tło:"
 ctrl.bg_title: "Tło pod wszystkimi podglądami logo (tabela, powiększenie, 🎨, 🖌). Presety Sync 3 to przybliżenia ekranów radia; najwierniej: własny obraz = zdjęcie/screen ekranu z auta (zostaje w tej przeglądarce)."
 ctrl.bg_none: "bez tła (jak plik)"
@@ -255,7 +255,7 @@ style.help_basic: "Styl tworzy nową wersję pliku (oryginały zostają nietkni�
 style.scope_selected: "Zaznaczone wiersze"
 style.scope_filter: "Widoczne w tabeli (wg filtrów)"
 style.scope_country: "Kraj"
-style.files: "{n} plików"
+style.files: "plików: {n}"
 style.preset: "Styl:"
 style.preset_save: "Zapisz jako…"
 style.preset_delete: "Usuń"

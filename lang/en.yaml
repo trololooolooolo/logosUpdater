@@ -21,7 +21,7 @@ col.actions: Actions
 # --- top controls ---
 ctrl.country_title: "Station country by RDS: ECC + first digit of the PI code (as in 🖌 Logo style). The list = every country in the FM/DAB DBs; picking one reloads the table."
 col.sort_title: "Click: ascending → descending → original order"
-ctrl.country_rows: "{n} rows"
+ctrl.country_rows: "rows: {n}"
 ctrl.bg: "Background:"
 ctrl.bg_title: "Background behind every logo preview (table, zoom, 🎨, 🖌). Sync 3 presets approximate the radio screens; most faithful: custom image = a photo/screenshot of the car screen (kept in this browser)."
 ctrl.bg_none: "none (as the file)"
@@ -268,7 +268,7 @@ style.help_basic: "A style makes a new version of each file (originals stay unto
 style.scope_selected: "Selected rows"
 style.scope_filter: "Shown in the table (filters)"
 style.scope_country: "Country"
-style.files: "{n} files"
+style.files: "files: {n}"
 style.preset: "Style:"
 style.preset_save: "Save as…"
 style.preset_delete: "Delete"
