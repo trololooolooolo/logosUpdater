@@ -1,0 +1,241 @@
+<!DOCTYPE html><html lang="__LANG__"><head><meta charset="UTF-8"><title>LogosUpdater</title>
+<link rel="stylesheet" href="/web/vendor/cropperjs/cropper.min.css">
+<script src="/web/vendor/cropperjs/cropper.min.js"></script>
+<link rel="stylesheet" href="/web/app.css">
+</head><body>
+    <div id="toastBox"></div>
+    <div id="confirmModal"><div class="confirm-box"><div class="msg" id="confirmMsg"></div><div class="btns"><button class="secondary" id="confirmNo" data-i18n="dialog.cancel">Cancel</button><button id="confirmYes" data-i18n="dialog.ok">OK</button></div></div></div>
+    <div id="logoTip"><img></div>
+    <div id="busy"><div class="spinner"></div></div>
+    <div class="topbar">
+    <div class="title-row">
+        <h1>LogosUpdater</h1>
+        <span id="editing" class="editing"></span>
+        <span id="pkgStatus" class="pkg-status" data-advanced data-i18n-title="pkg.summary_title" onclick="showPkgProblems()"></span>
+        <span class="grow"></span>
+        <label class="adv-toggle" data-i18n-title="ctrl.advanced_title"><input type="checkbox" id="advToggle" onchange="setAdvanced(this.checked)"> <span data-i18n="ctrl.advanced">Advanced mode</span></label>
+        <button class="secondary icon-btn" onclick="openSettings()" data-i18n-title="set.title" aria-label="Settings">⚙</button>
+    </div>
+    <nav class="steps" id="steps">
+        <button class="step" data-step="1" onclick="openLoad()"><span class="num">1</span><span class="lbl"><span data-i18n="step.1">Load from car</span><small id="step1st"></small></span></button>
+        <button class="step" data-step="2" onclick="document.getElementById('search').focus()"><span class="num">2</span><span class="lbl"><span data-i18n="step.2">Edit</span><small data-i18n="step.2_sub"></small></span></button>
+        <button class="step" data-step="3" onclick="openChanges()"><span class="num">3</span><span class="lbl"><span data-i18n="step.3">Review changes</span><small id="step3st"></small></span></button>
+        <button class="step" data-step="4" onclick="openUsb()"><span class="num">4</span><span class="lbl"><span data-i18n="step.4">USB package</span><small data-i18n="step.4_sub"></small></span></button>
+    </nav>
+    <div class="tool-groups needs-data">
+        <fieldset class="tool-group"><legend data-i18n="grp.stations">Stations</legend>
+            <button onclick="addStation()" data-i18n="st.add_btn" data-i18n-title="st.add_btn_title">Add station</button>
+            <button onclick="exportStations()" class="secondary" data-i18n="st.export_btn" data-i18n-title="st.export_title">Export CSV</button>
+            <button onclick="document.getElementById('csvInput').click()" class="secondary" data-i18n="st.import_btn" data-i18n-title="st.import_title">Import CSV</button>
+        </fieldset>
+        <fieldset class="tool-group"><legend data-i18n="grp.logos">Logos</legend>
+            <button class="secondary" onclick="openStyle()" data-i18n-title="style.btn_title"><span data-i18n="style.btn">Logo style</span> <span id="styleCount"></span></button>
+            <button class="secondary" data-advanced onclick="openVersions()" data-i18n-title="ver.btn_title"><span data-i18n="ver.btn">Logo versions</span> <span id="verCount"></span></button>
+        <span class="logo-bg-ctl" data-i18n-title="ctrl.bg_title"><span data-i18n="ctrl.bg">Background</span>
+            <select id="logoBg" onchange="logoBgChanged()">
+                <option value="none" data-i18n="ctrl.bg_none">none (as is)</option>
+                <option value="sync_black" selected data-i18n="ctrl.bg_sync_black">Sync 3 – black</option>
+                <option value="sync_tile" data-i18n="ctrl.bg_sync_tile">Sync 3 – preset tile</option>
+                <option value="sync_blue" data-i18n="ctrl.bg_sync_blue">Sync 3 – blue</option>
+                <option value="sync_grey" data-i18n="ctrl.bg_sync_grey">Sync 3 – light grey</option>
+                <option value="dark" data-i18n="ctrl.bg_dark">dark</option>
+                <option value="white" data-i18n="ctrl.bg_white">white</option>
+                <option value="checker" data-i18n="ctrl.bg_checker">checkerboard (transparency)</option>
+                <option value="color" data-i18n="ctrl.bg_color">custom colour…</option>
+                <option value="image" data-i18n="ctrl.bg_image">custom image (car photo)…</option>
+            </select>
+            <input type="color" id="logoBgColor" value="#000000" oninput="applyLogoBg();saveState()" style="display:none">
+            <input type="file" id="logoBgFile" accept="image/*" onchange="logoBgFile(this)" style="display:none">
+        </span>
+        </fieldset>
+        <fieldset class="tool-group" id="updGroup"><legend id="updLegend">Update</legend>
+            <label data-i18n-title="ctrl.update_db_title"><input type="checkbox" id="updDb" onchange="saveState()"> <span data-i18n="ctrl.update_db">DB (frequencies)</span></label>
+            <label data-i18n-title="ctrl.update_logos_title"><input type="checkbox" id="updLogos" onchange="saveState()"> <span data-i18n="ctrl.update_logos">Logo files</span></label>
+            <button onclick="runUpdate(this)" id="updGo" data-i18n="ctrl.update_go" data-i18n-title="btn.update_source_title">Update</button>
+            <span id="updProgress" class="small upd-progress" hidden></span>
+            <button id="updStop" class="danger" hidden onclick="cancelUpdate()" data-i18n="upd.stop">Stop</button>
+        </fieldset>
+        <fieldset class="tool-group" id="noSourceHint" hidden><legend data-i18n="grp.update_none">Update</legend>
+            <span class="small muted" data-i18n="ctrl.no_source" data-i18n-title="ctrl.no_source_title">No data source</span>
+            <button class="secondary" onclick="openSettings()" data-i18n="ctrl.no_source_set">Choose…</button>
+        </fieldset>
+        <fieldset class="tool-group" data-advanced><legend data-i18n="grp.image">Image</legend>
+            <button class="secondary" onclick="rebuildImage(this)" data-i18n="btn.build_image" data-i18n-title="btn.build_image_title">Build .img</button>
+        </fieldset>
+    </div>
+    <div class="filter-bar needs-data">
+        <input type="search" id="search" data-i18n-ph="ctrl.search_placeholder" placeholder="Search..." oninput="clearRowChecks();filterTable();resetPage();">
+        <select id="countryFilter" onchange="changeCountry()" data-i18n-title="ctrl.country_title"></select>
+        <label><input type="checkbox" id="dupToggle" onchange="filterTable();resetPage();"> <span data-i18n="ctrl.duplicates">Duplicates</span></label>
+        <label><input type="checkbox" id="noLogoToggle" onchange="filterTable();resetPage();"> <span data-i18n="ctrl.no_logo">No logo</span></label>
+        <select id="pkgFilter" data-advanced onchange="clearRowChecks();filterTable();resetPage();saveState();" data-i18n-title="pkg.filter_title">
+            <option value="" data-i18n="pkg.filter_all">Package: all</option>
+            <option value="missing" data-i18n="pkg.filter_missing">Missing from image</option>
+            <option value="differs" data-i18n="pkg.filter_differs">Other version in image</option>
+            <option value="pending" data-i18n="pkg.filter_pending">Picked version not built yet</option>
+            <option value="problem" data-i18n="pkg.filter_problem">Missing or other version</option>
+            <option value="absent" data-i18n="pkg.filter_absent">No file anywhere</option>
+        </select>
+        <span class="grow"></span>
+        <span class="small muted" id="visCount"></span>
+        <span class="small muted preview-note" data-i18n="ctrl.preview_note" data-i18n-title="ctrl.preview_note_title">Preview = what the car will show</span>
+    </div>
+    <div id="selBar" class="sel-bar" hidden>
+        <span id="selN"></span>
+        <button onclick="openBulkGallery()" data-i18n="sel.change">Change logo</button>
+        <button class="danger" onclick="deleteSelected()" data-i18n="sel.delete">Delete</button>
+        <button class="secondary" onclick="clearRowChecks()" data-i18n="sel.clear">Clear selection</button>
+    </div>
+    </div>
+    <div id="emptyState" class="empty-state" hidden>
+        <h2 data-i18n="empty.title">Load the files from your car first</h2>
+        <p data-i18n="empty.body"></p>
+        <ul class="mono"><li>station_logos.img</li><li>fm_station_logo.db</li><li>dab_station_logo.db</li></ul>
+        <p class="small muted" data-i18n="empty.where"></p>
+        <button onclick="openLoad()" data-i18n="empty.btn">Load files…</button>
+    </div>
+    <div class="list-wrap needs-data">
+    <table id="stationTable"><thead><tr><th><input type="checkbox" onclick="toggleAll(this)"></th><th data-i18n="col.type">Type</th><th data-i18n="col.id">ID</th><th class="sortable" data-sort="name" data-i18n-title="col.sort_title" onclick="sortTable('name')"><span data-i18n="col.name">Name</span><span class="sort-ind"></span></th><th class="sortable" data-sort="freq" data-i18n-title="col.sort_title" onclick="sortTable('freq')"><span data-i18n="col.freq">Freq.</span><span class="sort-ind"></span></th><th data-i18n="col.ecc">ECC</th><th data-i18n="col.preview">Preview</th><th data-i18n="col.file">File</th><th data-i18n="col.status">Status</th><th data-i18n="col.actions">Actions</th></tr></thead>
+    <tbody>__ROWS__</tbody></table>
+    </div>
+    <div id="pagination" class="pager needs-data">
+        <button class="secondary" onclick="prevPage()" data-i18n="btn.back">Back</button><span id="pageInfo"></span><button class="secondary" onclick="nextPage()" data-i18n="btn.next">Next</button>
+        <label class="small muted"><select id="pageSize" onchange="updatePageSize()"><option value="10">10</option><option value="50" selected>50</option><option value="100">100</option></select> <span data-i18n="ctrl.per_page">per page</span></label>
+    </div>
+    <footer class="app-footer"><span data-i18n="app.disclaimer">Independent project, not affiliated with Ford Motor Company.</span> · <a href="https://opensource.org/license/mit" target="_blank" rel="noopener">MIT</a></footer>
+    <input type="file" id="logoInput" style="display:none" accept="image/*">
+    <input type="file" id="csvInput" style="display:none" accept=".csv,text/csv" onchange="importStations(this)">
+    <div id="stationModal"><div class="modal-content st-box"><h3 id="stTitle">Station</h3>
+        <div class="st-form">
+            <label><span data-i18n="st.country">Country</span><b id="stCountry" class="mono"></b></label>
+            <label><span data-i18n="col.type">Type</span><select id="stType" onchange="stTypeChanged()"><option>FM</option><option value="DAB">DAB</option></select></label>
+            <label><span>PI</span><input id="stPi" class="mono" maxlength="4" autocomplete="off" spellcheck="false" data-i18n-title="st.pi_title"></label>
+            <label id="stFreqRow"><span data-i18n="col.freq">Freq.</span><input id="stFreq" class="mono" inputmode="decimal" autocomplete="off" placeholder="98.5"> MHz</label>
+            <label><span data-i18n="col.name">Name</span><input id="stName" maxlength="80" autocomplete="off" data-i18n-ph="st.name_ph"></label>
+        </div>
+        <p class="small" id="stFactoryNote" hidden data-i18n="st.factory_note"></p>
+        <p class="small" data-i18n="st.help"></p>
+        <div class="st-btns"><button class="secondary" onclick="closeStation()" data-i18n="dialog.cancel">Cancel</button>
+            <button class="secondary" id="stSaveLogo" onclick="saveStation(true)" data-i18n="st.save_logo">Save and pick logo</button>
+            <button onclick="saveStation(false)" data-i18n="st.save">Save</button></div></div></div>
+    <div id="importModal"><div class="modal-content st-box"><h3 data-i18n="st.import_title2">Import stations from CSV</h3>
+        <div id="importBody" style="flex:1 1 auto;overflow:auto"></div>
+        <div class="st-btns"><button class="secondary" onclick="closeImport()" data-i18n="dialog.cancel">Cancel</button>
+            <button id="importGo" onclick="confirmImport(this)" data-i18n="st.import_go">Import</button></div></div></div>
+    <div id="editorModal"><div class="modal-content"><h3 data-i18n="editor.title">Editor</h3>
+        <div style="flex:1 1 auto;min-height:200px;height:min(60vh,420px);background:#000;display:flex;align-items:center;justify-content:center;overflow:hidden"><img id="editorImage"></div>
+        <div style="flex:0 0 auto;margin-top:16px;text-align:right"><button onclick="rotateLeft()" data-i18n="editor.rotate">Rotate</button><button onclick="makeTransparent()" data-i18n="editor.transparency">Transparency</button><button onclick="closeEditor()" class="secondary" data-i18n="editor.cancel">Cancel</button><button onclick="saveAndUpload()" data-i18n="editor.save">Save</button></div></div></div>
+    <div id="galleryModal"><div class="modal-content"><h3 style="flex:0 0 auto" id="galleryTitle"></h3>
+        <div id="remoteLogoSection" style="flex:0 0 auto;display:none;background:#333;padding:10px;margin-bottom:10px;border-radius:4px">
+            <h4 data-i18n="gallery.logo_from_source">Logo from data source</h4>
+            <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap"><img id="remoteLogoImg"><button onclick="fetchRemoteLogo()" data-i18n="gallery.set_logo">Set this logo</button></div></div>
+        <input type="text" id="gallerySearch" data-i18n-ph="gallery.search_placeholder" placeholder="Search gallery / OCR..." style="flex:0 0 auto;width:100%;margin-bottom:10px;box-sizing:border-box" onkeyup="filterGallery()">
+        <div id="galleryGrid" class="gallery-grid"></div>
+        <div id="galleryPagination" style="flex:0 0 auto;text-align:center;padding:10px 0 0;display:none"><button onclick="loadMoreGallery()" data-i18n="gallery.load_more">More...</button></div>
+        <div style="flex:0 0 auto;margin-top:16px;text-align:right"><button onclick="closeGallery()" class="secondary" data-i18n="gallery.close">Close</button></div></div></div>
+    <div id="inputsModal"><div class="modal-content"><h3 style="flex:0 0 auto" data-i18n="inputs.title">Input sets</h3>
+        <div class="small" style="flex:0 0 auto;margin-bottom:10px;color:#999" id="inputsDir"></div>
+        <div style="flex:1 1 auto;overflow:auto"><table class="inputs-table"><thead><tr><th data-i18n="inputs.col_name">Set</th><th data-i18n="inputs.col_version">Firmware</th><th data-i18n="inputs.col_image">Image</th><th>FM</th><th>DAB</th><th data-i18n="inputs.col_info">Description</th><th></th></tr></thead>
+        <tbody id="inputsBody"></tbody></table></div>
+        <div style="flex:0 0 auto;margin-top:16px;text-align:right"><button onclick="closeInputs()" class="secondary" data-i18n="gallery.close">Close</button></div></div></div>
+    <div id="versionsModal"><div class="modal-content"><h3 style="flex:0 0 auto" data-i18n="ver.title">Logo versions</h3>
+        <div class="small ver-help" style="flex:0 0 auto" data-i18n="ver.help"></div>
+        <div class="ver-tools" style="flex:0 0 auto">
+            <select id="verFilter" onchange="renderVersions()">
+                <option value="" data-i18n="ver.f_all">All</option>
+                <option value="undecided" data-i18n="ver.f_undecided">Undecided</option>
+                <option value="pending" data-i18n="ver.f_pending">Not in the package yet</option>
+                <option value="image" data-i18n="ver.f_image">Chosen: image</option>
+                <option value="sync5" data-i18n="ver.f_sync5">Chosen: logos_sync5</option>
+                <option value="styled" data-i18n="ver.f_styled">Chosen: styled</option>
+            </select>
+            <input type="text" id="verSearch" data-i18n-ph="ver.search" placeholder="Search..." onkeyup="renderVersions()">
+            <button class="secondary" onclick="bulkVersions('image')" data-i18n="ver.all_image">All shown: image</button>
+            <button class="secondary" onclick="bulkVersions('sync5')" data-i18n="ver.all_sync5">All shown: logos_sync5</button>
+            <button class="secondary" onclick="bulkVersions(null)" data-i18n="ver.all_clear">Clear shown</button>
+        </div>
+        <div id="verGrid" class="ver-grid"></div>
+        <div style="flex:0 0 auto;margin-top:12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <span id="verInfo" class="small" style="flex:1 1 auto;color:#bbb"></span>
+            <button onclick="closeVersions()" class="secondary" data-i18n="dialog.cancel">Cancel</button>
+            <button onclick="saveVersions(false)" data-i18n="ver.save">Save</button>
+            <button class="secondary" data-advanced onclick="saveVersions(true)" data-i18n="ver.save_build">Save and build</button>
+        </div></div></div>
+    <div id="styleModal"><div class="modal-content"><h3 style="flex:0 0 auto" data-i18n="style.title">Logo style</h3>
+        <div class="small ver-help" style="flex:0 0 auto" data-advanced data-i18n="style.help"></div>
+        <div class="small ver-help" style="flex:0 0 auto" data-basic data-i18n="style.help_basic"></div>
+        <div class="style-top" style="flex:0 0 auto">
+            <div class="style-scope">
+                <label><input type="radio" name="styleScope" value="selected" onchange="styleScopeChanged()"> <span data-i18n="style.scope_selected">Selected rows</span> (<span id="styleSelN">0</span>)</label>
+                <label><input type="radio" name="styleScope" value="filter" onchange="styleScopeChanged()"> <span data-i18n="style.scope_filter">Shown in the table</span> (<span id="styleFiltN">0</span>)</label>
+                <label><input type="radio" name="styleScope" value="country" onchange="styleScopeChanged()"> <span data-i18n="style.scope_country">Country</span> <select id="styleCountry" onchange="document.querySelector('input[name=styleScope][value=country]').checked=true;styleScopeChanged()"></select></label>
+            </div>
+            <div class="style-preset">
+                <span data-i18n="style.preset">Preset</span> <select id="stylePreset" onchange="stylePresetPick()"></select>
+                <button class="secondary" onclick="styleSavePreset()" data-i18n="style.preset_save">Save as…</button>
+                <button class="secondary" id="stylePresetDel" onclick="styleDeletePreset()" data-i18n="style.preset_delete">Delete</button>
+            </div>
+        </div>
+        <div id="styleParams" class="style-params" style="flex:0 0 auto"></div>
+        <div class="style-bar" style="flex:0 0 auto">
+            <button onclick="stylePreview(true)" data-i18n="style.preview">Preview</button>
+            <label data-i18n-title="style.skip_warn_title"><input type="checkbox" id="styleSkipWarn" checked onchange="renderStyleGrid()"> <span data-i18n="style.skip_warn">Skip ⚠</span></label>
+            <span class="style-ai">
+                <select id="styleAiProv" data-i18n-title="style.ai_prov_title"><option value="gemini">Gemini</option><option value="kie">kie.ai</option></select>
+                <button id="styleAiBtn" class="secondary" onclick="styleAi()" data-i18n="style.ai_btn" data-i18n-title="style.ai_btn_title">🤖 AI for ⚠</button>
+            </span>
+            <span id="styleInfo" class="small"></span>
+        </div>
+        <div id="styleGrid" class="ver-grid style-grid"></div>
+        <div style="flex:0 0 auto;margin-top:12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <button class="danger" onclick="styleClear()" data-i18n="style.clear" data-i18n-title="style.clear_title">Remove style</button>
+            <span style="flex:1 1 auto"></span>
+            <button onclick="closeStyle()" class="secondary" data-i18n="gallery.close">Close</button>
+            <button onclick="styleApply(false)" data-i18n="style.apply">Apply</button>
+            <button class="secondary" data-advanced onclick="styleApply(true)" data-i18n="style.apply_build">Apply and build</button>
+        </div></div></div>
+    <div id="usbModal"><div class="modal-content usb-box"><h3 style="flex:0 0 auto" data-i18n="usb.title">USB package</h3>
+        <div style="flex:1 1 auto;overflow:auto">
+        <p class="usb-basic" data-i18n="usb.basic_note"></p>
+        <label class="usb-opt usb-restore"><input type="checkbox" id="usbRestore" onchange="usbRestoreChanged()"> <b data-i18n="usb.restore">Pack the loaded files unchanged (undo)</b></label>
+        <p class="small muted usb-sub" data-i18n="usb.restore_note"></p>
+        <div data-advanced><h4 data-i18n="usb.image">Image</h4><div id="usbImages"></div></div>
+        <h4 data-i18n="usb.target">Destination</h4><div id="usbTargets"></div>
+        <p class="small usb-help" data-i18n="usb.help"></p></div>
+        <div style="flex:0 0 auto;margin-top:16px;text-align:right"><button onclick="closeUsb()" class="secondary" data-i18n="dialog.cancel">Cancel</button><button onclick="makeUsb(this)" data-i18n="usb.make">Prepare</button></div></div></div>
+    <div id="loadModal" class="modal"><div class="modal-content load-box"><h3 data-i18n="load.title">Load from car</h3>
+        <div class="modal-body">
+        <p class="small muted" data-i18n="load.intro"></p>
+        <section class="load-sec"><h4 data-i18n="load.usb_h">From a USB stick</h4>
+            <div id="loadUsb"></div>
+            <p class="small muted" data-i18n="load.server_note"></p>
+            <button class="secondary" onclick="refreshUsbInputs()" data-i18n="load.usb_refresh">Refresh</button></section>
+        <section class="load-sec"><h4 data-i18n="load.upload_h">Upload from this computer</h4>
+            <p class="small" data-i18n="load.upload_help"></p>
+            <input type="file" id="loadFiles" multiple accept=".img,.db" onchange="loadFilesPicked(this)" hidden>
+            <button class="secondary" onclick="document.getElementById('loadFiles').click()" data-i18n="load.pick">Choose files…</button>
+            <ul id="loadPicked" class="load-picked"></ul>
+            <div id="loadProgress" class="progress" hidden><div></div><span></span></div>
+            <button id="loadUploadBtn" onclick="uploadFiles(this)" disabled data-i18n="load.go">Load these files</button></section>
+        <section class="load-sec" data-advanced><h4 data-i18n="load.sets_h">Input sets (inputs/)</h4>
+            <button class="secondary" onclick="closeLoad();openInputs()" data-i18n="load.sets_btn">Open the list…</button></section>
+        </div>
+        <div class="modal-foot"><button class="secondary" onclick="closeLoad()" data-i18n="gallery.close">Close</button></div></div></div>
+    <div id="changesModal" class="modal"><div class="modal-content chg-box"><h3 data-i18n="chg.title">Review changes</h3>
+        <div class="modal-body" id="changesBody"></div>
+        <div class="modal-foot"><button class="secondary" onclick="closeChanges()" data-i18n="gallery.close">Close</button>
+            <button onclick="closeChanges();openUsb()" data-i18n="chg.next">Next: USB package</button></div></div></div>
+    <div id="settingsModal" class="modal"><div class="modal-content st-box"><h3 data-i18n="set.title">Settings</h3>
+        <div class="st-form">
+            <label><span data-i18n="set.language">Language</span><select id="setLang"></select></label>
+            <label><span data-i18n="set.source">Station data</span><select id="setSource" onchange="setSourceChanged()"></select></label>
+            <div id="setFields" class="set-fields"></div>
+        </div>
+        <p class="small muted" id="setSourceHelp"></p>
+        <p class="small warn" id="setPluginErrors" hidden></p>
+        <p class="small muted" data-i18n="set.note"></p>
+        <div class="st-btns"><button class="secondary" onclick="closeSettings()" data-i18n="dialog.cancel">Cancel</button>
+            <button onclick="saveSettings(this)" data-i18n="set.save">Save</button></div></div></div>
+    <script>const T = __T_JSON__; const UI_CFG = __CFG_JSON__;</script>
+    <script src="/web/app.js"></script>
+</body></html>

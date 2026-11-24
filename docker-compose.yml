@@ -1,0 +1,19 @@
+# docker compose up -d   ->   http://localhost:8000
+# All data (config.yaml, work/, inputs/, usb_package/, ...) is kept in the named volume
+# "logosupdater-data" and survives restarts and image rebuilds.
+#   copy files in:  docker compose cp ./my-set logosupdater:/data/inputs/01_my-set
+#   back it up:     docker compose cp logosupdater:/data ./logosupdater-backup
+# Prefer a folder on the host? Create it first (mkdir data; it must be writable by uid 1000)
+# and replace the volume line with:  - ./data:/data
+services:
+  logosupdater:
+    build: .
+    image: logosupdater:local
+    ports:
+      - "127.0.0.1:8000:8000"   # this computer only; the app has no password
+    volumes:
+      - logosupdater-data:/data
+    restart: unless-stopped
+
+volumes:
+  logosupdater-data:

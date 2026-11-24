@@ -1,0 +1,84 @@
+name: release
+
+# Tag vX.Y.Z -> one ready-to-run file per system, attached to a GitHub Release.
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest   # x64
+            asset: LogosUpdater-windows-x64.exe
+          - os: ubuntu-22.04     # x64; older glibc = runs on more distributions
+            asset: LogosUpdater-linux-x64
+          - os: macos-14         # arm64 (Apple silicon)
+            asset: LogosUpdater-macos-arm64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install -r requirements.txt pyinstaller==6.11.1
+      - run: python -m unittest discover -s tests
+      - name: Refuse a release with the placeholder project URL (it is sent in every User-Agent)
+        shell: bash
+        run: "! grep -q \"github.com/logosupdater/logosupdater\" fetcher.py"
+      - name: Version from the tag (sent in the User-Agent)
+        shell: bash
+        run: |
+          python -c "import re,sys; p='fetcher.py'; s=open(p,encoding='utf-8').read(); open(p,'w',encoding='utf-8',newline='').write(re.sub(r'(?m)^VERSION = .*', 'VERSION = ' + repr(sys.argv[1]), s, count=1))" "${GITHUB_REF_NAME#v}"
+          grep '^VERSION' fetcher.py
+      - run: pyinstaller --noconfirm --clean packaging/logosupdater.spec
+      - name: Smoke test (starts, writes config.yaml next to the executable)
+        shell: bash
+        timeout-minutes: 5
+        run: |
+          mkdir smoke && cp dist/LogosUpdater* smoke/
+          cd smoke
+          stop() {
+            # PyInstaller --onefile = bootloader + child process: stop the whole tree
+            if [ "$RUNNER_OS" = "Windows" ]; then
+              taskkill //F //T //IM LogosUpdater.exe >/dev/null 2>&1 || true
+            else
+              pkill -f '[L]ogosUpdater' || true
+            fi
+          }
+          fail() { echo "::error::$1"; echo "--- smoke.log ---"; cat smoke.log || true; stop; exit 1; }
+          trap stop EXIT
+          ./LogosUpdater* --no-browser --port 8765 >smoke.log 2>&1 </dev/null &
+          for i in $(seq 1 30); do curl -sf -o /dev/null http://127.0.0.1:8765/api/session && break; sleep 1; done
+          curl -sf http://127.0.0.1:8765/api/session || fail "/api/session does not answer"
+          curl -sf http://127.0.0.1:8765/ | grep -q '<title>' || fail "index page"   # web/ + lang/ made it into the bundle
+          curl -sf -o /dev/null http://127.0.0.1:8765/web/vendor/cropperjs/cropper.min.js || fail "vendored cropperjs"
+          test -f config.yaml || fail "config.yaml not written next to the executable"
+      - name: Rename
+        shell: bash
+        run: mv dist/LogosUpdater* "dist/${{ matrix.asset }}"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.asset }}
+          path: dist/${{ matrix.asset }}
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${{ github.ref_name }}" dist/* --repo "${{ github.repository }}" \
+            --title "LogosUpdater ${{ github.ref_name }}" --generate-notes \
+            $([[ "${{ github.ref_name }}" == *-* ]] && echo --prerelease)

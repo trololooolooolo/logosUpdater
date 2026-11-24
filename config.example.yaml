@@ -1,0 +1,77 @@
+# LogosUpdater configuration template.
+# Copy this file to config.yaml and edit. On first run, if config.yaml is
+# missing, the app writes one from the built-in defaults automatically.
+# Precedence: CLI flag > config.yaml > built-in defaults.
+
+language: en                  # UI language; must match a lang/<code>.yaml catalog (en, pl, ...)
+port: 8000                    # HTTP port for the local web server (http://localhost:<port>)
+server:
+  host: 127.0.0.1             # only this computer; 0.0.0.0 = whole network (no password!)
+  # allowed_hosts: [carpc.lan] # extra host names the UI may be opened by (IP addresses always work)
+
+# What an update does. Two independent switches; nothing runs automatically
+# unless on_startup is true (default: preview the current img/db set).
+update:
+  on_startup: false           # run an update in the background at launch
+  database: true              # switch 1: refresh the DBs with new/changed frequencies
+  logos: true                 # switch 2: download logo files missing locally
+
+data_source: none             # none (no downloads) | radiopolska (Poland) | csv_file (your own list)
+
+paths:
+  image:     work/station_logos.img  # source QNX6 image read for the logo gallery / build base
+  image_out: work/station_logos_new.img  # output image produced by the build
+  db_fm:     work/fm_station_logo.db   # SQLite DB: FM station -> logo mapping
+  db_dab:    work/dab_station_logo.db  # SQLite DB: DAB station -> logo mapping
+  db_ocr:    logo_ocr.db             # SQLite DB: OCR results used for gallery matching
+  logo_dir:  logos_sync5             # directory of new/updated PNG logos ({ECC}/{NAME}.PNG)
+  mount_dir: work/logos_mnt          # where the loaded image is extracted (gallery, previews)
+  work_dir:  work/qnx_merged         # scratch directory for building the output image
+  inputs_dir: inputs                 # read-only input sets (one subdir per img + FM/DAB DBs), listed in the UI
+  usb_dir:   usb_package             # where "Prepare USB package" puts the SyncMyMod .zip
+  logo_choices: logo_choices.json    # per-file pick: image / logos_sync5 / styled version ("Logo versions"), used by the build
+  styled_dir: logos_styled           # logos restyled with "Logo style" ({ECC}/{NAME}.PNG + _meta.json)
+  station_names: station_names.json  # station names typed in the editor (shown in the app only)
+
+# OCR.space key for the optional helper ocr_api_scanner.py (or env OCR_SPACE_API_KEY):
+# ocr:
+#   api_key: ''
+
+ai:                           # 🖌 Logo style -> 🤖 AI redraw of logos marked ⚠ (logo_ai.py)
+  provider: gemini            # gemini | kie
+  gemini_api_key: ""          # or env GEMINI_API_KEY (config.yaml is gitignored)
+  gemini_model: gemini-nano-banana-2.1
+  kie_api_key: ""             # or env KIE_API_KEY
+  kie_model: google/nano-banana-edit
+  # price_per_image: {gemini: 0.034, kie: null}   # USD, only for the cost estimate in the UI
+  # workers: 3                # parallel requests
+
+fetch:                        # how the app talks to external sites (source updates, logo downloads; fetcher.py)
+  # max_parallel: requests in flight per host. Hard range 1..4; higher values are clamped to 4.
+  # Why a cap at all: station sites are mostly small, volunteer-run servers, and every user of this
+  # app hits the same few sites. More than a handful of parallel connections from one client looks
+  # like (and can act like) a denial-of-service, gets the app's User-Agent blocked for everyone, and
+  # barely speeds anything up because min_interval still spaces the requests out. Plugins may only lower it.
+  max_parallel: 1
+  min_interval: 1.0           # seconds between request starts to one host; plugins may only raise it (min 0.5)
+  timeout: 20                 # seconds per request (connect / each read, and total body download)
+  budget: 2000                # max requests per update run; 304 Not Modified answers don't count
+  respect_robots: true        # skip URLs the site's robots.txt disallows for LogosUpdater (counted in the report)
+  public_only: true           # only public internet hosts (never this computer or your LAN), every redirect checked
+  max_bytes:                  # response size limit per kind of request; bigger answers are dropped
+    page: 2000000             # station detail pages
+    list: 10000000            # station lists
+    image: 2000000            # logo images (Content-Type image/*, or no type but image bytes)
+  max_age_days:               # use a cached answer this many days without asking the site again
+    page: 7                   # station pages (radiopolska.pl ignores If-Modified-Since, so 304 never comes)
+    image: 0                  # logo files: always revalidated (sites answer 304 for unchanged images)
+
+sources:                      # per-source settings, keyed by source id
+  radiopolska:
+    base_url: https://radiopolska.pl   # site root for the RadioPolska source
+    list_path: /wykaz/bazapi           # path to the station list (bazapi)
+    changes_path: /wykaz/zmiany        # path used to detect upstream changes
+    logo_selector: img.wykaz-logotyp   # CSS selector for the logo <img> on a station page
+  csv_file:                            # your own station list (any country)
+    path: stations.csv                 # see docs/examples/stations.example.csv
+    default_ecc: E0                    # RDS country for rows without an ECC value (E0 = Germany)

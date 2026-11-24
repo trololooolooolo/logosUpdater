@@ -1,0 +1,61 @@
+# === Duże binaria / obrazy QNX6 (nie wersjonujemy) ===
+*.img
+*.iso
+*.qfs
+*.ifs
+
+# === Bazy danych (dane, nie kod) ===
+*.db
+
+# === Dane / grafiki ===
+logos_sync5/
+qnx_extracted/
+qnx_merged/
+
+# === Pliki generowane / robocze ===
+__pycache__/
+*.pyc
+*.bak
+*.bak-*
+*.log
+sync_log.txt
+sync_log.txt.bak
+last_change.txt
+
+# === Wygenerowane CSV / cache ===
+output.csv
+output_*.csv
+radiopolska_stacje*.csv
+id*.txt
+
+# === Środowiska / IDE ===
+.venv/
+venv/
+.idea/
+.vscode/
+
+# === Lokalne ustawienia Claude Code (maszynowe) ===
+.claude/settings.local.json
+
+# Lokalna konfiguracja użytkownika (config.example.yaml jest wersjonowany)
+config.yaml
+config.yaml.bak
+
+# Katalog roboczy diagnostyki QNX (obrazy/logi z auta)
+test/
+inputs/
+work/
+usb_package/
+logo_choices.json
+logos_styled/
+
+# Lokalna ekstrakcja obrazu (fallback gdy mount_dir to martwy mount)
+.image_cache/
+
+# Stara ścieżka QEMU/QNX SDP (lokalnie, nie w repo)
+qnx_work/
+INSTRUKCJA_QNX6.md
+station_names.json
+logos_mnt/
+logos_mnt_built/
+/data/
