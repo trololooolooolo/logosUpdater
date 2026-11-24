@@ -83,6 +83,7 @@ msg.build_overwrite: "Nadpisać też ISTNIEJĄCE logo nowszymi wersjami z logos_
 
 status.updating: "⏳ Aktualizuję..."
 status.building: "⏳ Buduję..."
+status.busy_elapsed: "⏳ Nadal pracuję… {time}. Budowa lub pakowanie dużego obrazu może potrwać kilka minut; nie zamykaj tej strony."
 toast.no_logo_url: "Brak URL logo dla tej stacji (odśwież dane ze źródła)."
 
 err.prefix: "Błąd: "

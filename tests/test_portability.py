@@ -129,5 +129,13 @@ class UserPlugins(unittest.TestCase):
             self.assertEqual(sources._user_plugin_dir(), os.path.join(os.path.abspath(os.path.join(os.sep, 'data')), 'sources'))
 
 
+class CountryNames(unittest.TestCase):
+    def test_labels(self):
+        import server
+        self.assertEqual(server._country_label('E2-3'), 'PL (E2-3)')
+        self.assertEqual(server._country_label('F0-2'), 'AU (F0-2)')        # Australia: ECC F0, digit = state
+        self.assertEqual(server._country_label('F1-9'), 'F1-9')             # unknown: bare code, no "?"
+
+
 if __name__ == '__main__':
     unittest.main()

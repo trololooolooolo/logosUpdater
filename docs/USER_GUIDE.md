@@ -57,6 +57,8 @@ Pick **one** of the ways below. The ready-made file is the easiest.
    | macOS (Apple silicon: M1, M2, …) | `LogosUpdater-macos-arm64` |
    | Linux (64-bit) | `LogosUpdater-linux-x64` |
 
+   No file for your system on that page yet? Use **From source** below.
+
 2. **Make a new, empty folder** (for example `LogosUpdater` in your Documents) and put the file there.
    The app keeps all its work next to the file — not straight on the Desktop.
 3. Start it:
@@ -83,7 +85,7 @@ so the rest of your system is not touched.
 
 **1. Get the code.** Pick one:
 
-- On the **Releases** page, download **Source code (zip)** and unpack it into a new folder.
+- On the [repository page](https://github.com/trololooolooolo/logosUpdater), click the green **Code** button → **Download ZIP** and unpack it into a new folder.
 - Or, if you have git, run:
   ```bash
   git clone https://github.com/trololooolooolo/logosUpdater.git

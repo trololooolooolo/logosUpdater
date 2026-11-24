@@ -59,6 +59,8 @@ Wybierz **jeden** z poniższych sposobów. Najprostszy jest gotowy plik.
    | macOS (Apple silicon: M1, M2, …) | `LogosUpdater-macos-arm64` |
    | Linux (64-bit) | `LogosUpdater-linux-x64` |
 
+   Na tej stronie nie ma jeszcze pliku dla Twojego systemu? Skorzystaj z punktu **Ze źródeł** poniżej.
+
 2. **Załóż nowy, pusty katalog** (np. `LogosUpdater` w Dokumentach) i włóż tam plik. Aplikacja
    trzyma całą swoją pracę obok pliku — nie kładź go wprost na Pulpicie.
 3. Uruchom:
@@ -86,7 +88,7 @@ nietknięta.
 
 **1. Pobierz kod.** Wybierz jedno:
 
-- Na stronie **Releases** pobierz **Source code (zip)** i rozpakuj go do nowego katalogu.
+- Na [stronie repozytorium](https://github.com/trololooolooolo/logosUpdater) kliknij zielony przycisk **Code** → **Download ZIP** i rozpakuj go do nowego katalogu.
 - Albo, jeśli masz git, wpisz:
   ```bash
   git clone https://github.com/trololooolooolo/logosUpdater.git

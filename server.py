@@ -1270,7 +1270,7 @@ class StationViewerHandler(http.server.SimpleHTTPRequestHandler):
                 return self._send_json({'status': 'error', 'message': tr('err.no_ecc')}, 400)
             if pi and pi[0] != digit and not d.get('confirm') and action == 'add':
                 return self._send_json({'status': 'confirm',
-                                        'message': tr('st.pi_other_country', pi=pi, country=f"{ecc}-{pi[0]}")})
+                                        'message': tr('st.pi_other_country', pi=pi, country=_country_label(f"{ecc}-{pi[0]}"))})
             if not SET_LOCK.acquire(blocking=False):
                 return self._send_json({'status': 'error', 'message': tr('err.busy')}, 409)
             try:
@@ -1785,6 +1785,12 @@ class StationViewerHandler(http.server.SimpleHTTPRequestHandler):
             self.send_header('Content-Length', str(len(data))); self.end_headers()
             self.wfile.write(data); return
         self.send_response(404); self.end_headers()
+
+
+def _country_label(code):
+    """'PL (E2-3)' for an RDS country code, or the bare code when it has no name."""
+    name = logo_style.country_name(code)
+    return f"{name} ({code})" if name else code
 
 
 def _row_countries():

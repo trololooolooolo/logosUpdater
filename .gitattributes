@@ -1,0 +1,15 @@
+# Line endings: text files are normalized to LF in the repository. Scripts that run in a POSIX
+# shell (verify_mount.sh, the car's autoinstall.sh templates) must stay LF in every checkout,
+# also with Git for Windows' default core.autocrlf=true.
+* text=auto
+*.sh text eol=lf
+Dockerfile text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+
+# binary
+*.png binary
+*.PNG binary
+*.img binary
+*.db binary
+*.zip binary

@@ -15,7 +15,19 @@ function toast(msg, type='info', timeout=6000) {
     el.onclick=()=>el.remove(); box.appendChild(el);
     if(timeout) setTimeout(()=>el.remove(), timeout);
 }
-function setBusy(on) { document.body.classList.toggle('busy', on); }
+// long jobs (a 10k-file image takes minutes): after a few seconds show the elapsed time, so nobody thinks it hung
+let _busyTimer=null, _busyStart=0;
+function setBusy(on) {
+    document.body.classList.toggle('busy', on);
+    const info=document.getElementById('busyInfo');
+    clearInterval(_busyTimer); _busyTimer=null; if(info) info.textContent='';
+    if(!on || !info) return;
+    _busyStart=Date.now();
+    _busyTimer=setInterval(()=>{
+        const s=Math.floor((Date.now()-_busyStart)/1000);
+        if(s>=5) info.textContent=tr('status.busy_elapsed', {time:`${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`});
+    }, 1000);
+}
 function confirmDialog(msg, yes=T['dialog.ok'], no=T['dialog.cancel']) {
     return new Promise(res=>{
         const m=document.getElementById('confirmModal');
@@ -120,7 +132,7 @@ function fillCountryFilter() {
     const cs=document.getElementById('countryFilter'); cs.innerHTML='';
     Object.keys(cnt).sort((a,b)=>cnt[b]-cnt[a] || a.localeCompare(b)).forEach(k=>{
         const o=document.createElement('option'); o.value=k;
-        o.textContent=`${names[k]||'?'} (${k}) · ${tr('ctrl.country_rows', {n:cnt[k]})}`; cs.appendChild(o);
+        o.textContent=`${names[k] ? names[k]+' ('+k+')' : k} · ${tr('ctrl.country_rows', {n:cnt[k]})}`; cs.appendChild(o);
     });
     cs.value=UI_CFG.country||'';
 }
@@ -465,7 +477,7 @@ async function saveStation(pickLogo) {
         closeStation();
         if(other) {
             const names = UI_CFG.countries || {};
-            toast(tr('st.saved_other_country', {country: other, name: names[other] || '?'}), 'ok', 10000);
+            toast(tr('st.saved_other_country', {country: other, name: names[other] || other}), 'ok', 10000);
         } else toast(d ? T['st.saved'] : T['st.added'], 'ok');
         if(pickLogo && row) openGalleryRow(row.querySelector('.actions button.secondary'));
     } catch(e) { toast(T['err.prefix']+e, 'err'); }
@@ -711,7 +723,7 @@ async function openStyle() {
         document.getElementById('styleFiltN').textContent=_keysOf(getVisible()).length;
         const cs=document.getElementById('styleCountry'); cs.innerHTML='';
         d.countries.forEach(c=>{ const o=document.createElement('option'); o.value=c.code;
-            o.textContent=`${c.name||'?'} (${c.code}) · ${tr('style.files', {n:c.files})}`; cs.appendChild(o); });
+            o.textContent=`${c.name ? c.name+' ('+c.code+')' : c.code} · ${tr('style.files', {n:c.files})}`; cs.appendChild(o); });
         if(d.countries.find(c=>c.code==='E2-3')) cs.value='E2-3';
         document.querySelector(`input[name=styleScope][value=${sel.length?'selected':'country'}]`).checked=true;
         let last={}; try { last=JSON.parse(localStorage.getItem('lu_style')||'{}'); } catch(e) {}

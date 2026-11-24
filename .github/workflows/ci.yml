@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu-latest, windows-latest]          # macOS: ci-macos.yml (its runners are often short)
         python: ["3.10", "3.13"]
     runs-on: ${{ matrix.os }}
     steps:

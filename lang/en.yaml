@@ -94,6 +94,7 @@ msg.build_overwrite: "Also overwrite EXISTING logos with newer versions from log
 # --- transient toasts / status ---
 status.updating: "⏳ Updating..."
 status.building: "⏳ Building..."
+status.busy_elapsed: "⏳ Still working… {time}. Building or packing a large image can take a few minutes; don't close this page."
 toast.no_logo_url: "No logo URL for this station (refresh data from the source)."
 
 # --- toast/error prefixes (concatenated with server detail) ---

@@ -69,12 +69,20 @@ jobs:
 
   publish:
     needs: build
+    # also when a build job failed or never got a runner (macOS capacity): publish what was built,
+    # but only if the Windows and Linux files are there (checked below)
+    if: ${{ always() && !cancelled() }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v4
         with:
           path: dist
           merge-multiple: true
+      - name: Windows and Linux files are required
+        run: |
+          ls -l dist
+          test -f dist/LogosUpdater-windows-x64.exe && test -f dist/LogosUpdater-linux-x64
+          test -f dist/LogosUpdater-macos-arm64 || echo "::warning::No macOS file in this release (build failed or no runner)"
       - name: Create release
         env:
           GH_TOKEN: ${{ github.token }}
